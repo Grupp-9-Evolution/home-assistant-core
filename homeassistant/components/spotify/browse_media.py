@@ -40,6 +40,8 @@ class BrowsableMedia(StrEnum):
     CURRENT_USER_RECENTLY_PLAYED = "current_user_recently_played"
     CURRENT_USER_TOP_ARTISTS = "current_user_top_artists"
     CURRENT_USER_TOP_TRACKS = "current_user_top_tracks"
+    CURRENT_USER_QUEUE = "current_user_queue"
+
     CATEGORIES = "categories"
     FEATURED_PLAYLISTS = "featured_playlists"
     NEW_RELEASES = "new_releases"
@@ -54,6 +56,7 @@ LIBRARY_MAP = {
     BrowsableMedia.CURRENT_USER_RECENTLY_PLAYED.value: "Recently played",
     BrowsableMedia.CURRENT_USER_TOP_ARTISTS.value: "Top Artists",
     BrowsableMedia.CURRENT_USER_TOP_TRACKS.value: "Top Tracks",
+    BrowsableMedia.CURRENT_USER_QUEUE.value: "Queue",
     BrowsableMedia.CATEGORIES.value: "Categories",
     BrowsableMedia.FEATURED_PLAYLISTS.value: "Featured Playlists",
     BrowsableMedia.NEW_RELEASES.value: "New Releases",
@@ -89,6 +92,10 @@ CONTENT_TYPE_MEDIA_CLASS: dict[str, Any] = {
         "children": MediaClass.ARTIST,
     },
     BrowsableMedia.CURRENT_USER_TOP_TRACKS.value: {
+        "parent": MediaClass.DIRECTORY,
+        "children": MediaClass.TRACK,
+    },
+    BrowsableMedia.CURRENT_USER_QUEUE.value: {
         "parent": MediaClass.DIRECTORY,
         "children": MediaClass.TRACK,
     },
@@ -294,6 +301,9 @@ def build_item_response(  # noqa: C901
     elif media_content_type == BrowsableMedia.CURRENT_USER_TOP_TRACKS:
         if media := spotify.current_user_top_tracks(limit=BROWSE_LIMIT):
             items = media.get("items", [])
+    elif media_content_type == BrowsableMedia.CURRENT_USER_QUEUE:
+        if media := spotify.current_user_queue(limit=BROWSE_LIMIT):
+            items = media.get("queue", [])
     elif media_content_type == BrowsableMedia.FEATURED_PLAYLISTS:
         if media := spotify.featured_playlists(
             country=user["country"], limit=BROWSE_LIMIT
